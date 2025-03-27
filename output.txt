@@ -1,0 +1,153 @@
+(venv) (base) jyotirmoykonwar@jyotirmoykonwar:~/Desktop/Projects/BTP 6$ python MvMOC_DS.py text.txt
+[nltk_data] Downloading package punkt_tab to
+[nltk_data]     /home/jyotirmoykonwar/nltk_data...
+[nltk_data]   Unzipping tokenizers/punkt_tab.zip.
+Processed 69 sentences.
+Generating TF-IDF embeddings...
+Generating BERT embeddings...
+modules.json: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 229/229 [00:00<00:00, 955kB/s]
+config_sentence_transformers.json: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 122/122 [00:00<00:00, 1.19MB/s]
+README.md: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 3.77k/3.77k [00:00<00:00, 32.8MB/s]
+sentence_bert_config.json: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 53.0/53.0 [00:00<00:00, 574kB/s]
+config.json: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 625/625 [00:00<00:00, 7.03MB/s]
+model.safetensors: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 438M/438M [00:16<00:00, 26.1MB/s]
+tokenizer_config.json: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 399/399 [00:00<00:00, 2.32MB/s]
+vocab.txt: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 232k/232k [00:00<00:00, 563kB/s]
+tokenizer.json: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 466k/466k [00:00<00:00, 947kB/s]
+added_tokens.json: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2.00/2.00 [00:00<00:00, 11.3kB/s]
+special_tokens_map.json: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 112/112 [00:00<00:00, 618kB/s]
+config.json: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 190/190 [00:00<00:00, 978kB/s]
+Generating ColBERT embeddings...
+model.safetensors: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 440M/440M [00:15<00:00, 29.3MB/s]
+Starting optimization...
+==========================================================
+n_gen  |  n_eval  | n_nds  |      eps      |   indicator  
+==========================================================
+     1 |        7 |      5 |             - |             -
+     2 |       27 |     20 |  0.2928356754 |         ideal
+     3 |       47 |     20 |  0.000000E+00 |             f
+     4 |       67 |     20 |  0.000000E+00 |             f
+     5 |       87 |     20 |  0.000000E+00 |             f
+     6 |      107 |     20 |  0.000000E+00 |             f
+     7 |      127 |     20 |  0.000000E+00 |             f
+     8 |      147 |     20 |  0.000000E+00 |             f
+     9 |      167 |     20 |  0.000000E+00 |             f
+    10 |      187 |     20 |  0.000000E+00 |             f
+    11 |      207 |     20 |  0.000000E+00 |             f
+    12 |      227 |     20 |  0.000000E+00 |             f
+    13 |      247 |     20 |  0.000000E+00 |             f
+    14 |      267 |     20 |  0.000000E+00 |             f
+    15 |      287 |     20 |  0.000000E+00 |             f
+    16 |      307 |     20 |  0.000000E+00 |             f
+    17 |      327 |     20 |  0.000000E+00 |             f
+    18 |      347 |     20 |  0.000000E+00 |             f
+    19 |      367 |     20 |  0.000000E+00 |             f
+    20 |      387 |     20 |  0.000000E+00 |             f
+    21 |      407 |     20 |  0.000000E+00 |             f
+    22 |      427 |     20 |  0.000000E+00 |             f
+    23 |      447 |     20 |  0.000000E+00 |             f
+    24 |      467 |     20 |  0.000000E+00 |             f
+    25 |      487 |     20 |  0.000000E+00 |             f
+    26 |      507 |     20 |  0.000000E+00 |             f
+    27 |      527 |     20 |  0.000000E+00 |             f
+    28 |      547 |     20 |  0.000000E+00 |             f
+    29 |      567 |     20 |  0.000000E+00 |             f
+    30 |      587 |     20 |  0.000000E+00 |             f
+Optimization complete.
+Optimal solutions:
+Solution 1: Clusters=9, Silhouette=0.0441, PBM=19111.8153
+Solution 2: Clusters=2, Silhouette=0.1300, PBM=182.7264
+Solution 3: Clusters=2, Silhouette=0.1300, PBM=182.7264
+Solution 4: Clusters=9, Silhouette=0.0441, PBM=19111.8153
+Solution 5: Clusters=4, Silhouette=0.0810, PBM=2036.6972
+Solution 6: Clusters=7, Silhouette=0.0630, PBM=9921.0337
+Solution 7: Clusters=8, Silhouette=0.0511, PBM=13421.0349
+Solution 8: Clusters=7, Silhouette=0.0630, PBM=9921.0337
+Solution 9: Clusters=3, Silhouette=0.1049, PBM=882.6028
+Solution 10: Clusters=3, Silhouette=0.1049, PBM=882.6028
+Solution 11: Clusters=4, Silhouette=0.0810, PBM=2036.6972
+Solution 12: Clusters=8, Silhouette=0.0511, PBM=13421.0349
+Solution 13: Clusters=2, Silhouette=0.1300, PBM=182.7264
+Solution 14: Clusters=9, Silhouette=0.0441, PBM=19111.8153
+Solution 15: Clusters=7, Silhouette=0.0630, PBM=9921.0337
+Solution 16: Clusters=4, Silhouette=0.0810, PBM=2036.6972
+Solution 17: Clusters=2, Silhouette=0.1300, PBM=182.7264
+Solution 18: Clusters=2, Silhouette=0.1300, PBM=182.7264
+Solution 19: Clusters=2, Silhouette=0.1300, PBM=182.7264
+Solution 20: Clusters=4, Silhouette=0.0810, PBM=2036.6972
+
+Selected best solution: 9 clusters
+
+Sample clustering results:
+Sentence 1:
+Quick and Easy One Pan Tuna Fried Rice
+This is the best tuna fried rice recipe!
+TF-IDF cluster: 3
+BERT cluster: 1
+ColBERT cluster: 4
+
+Sentence 2:
+Made with canned tuna, white rice, eggs, vegetables, and a delicious homemade fried rice sauce, this recipe is so easy to make and is ready in just 25 minutes.
+TF-IDF cluster: 3
+BERT cluster: 1
+ColBERT cluster: 1
+
+Sentence 3:
+You can have a healthy meal on the table in no time!
+TF-IDF cluster: 1
+BERT cluster: 3
+ColBERT cluster: 8
+
+Sentence 4:
+A pan of tuna fried rice with chopsticks on top of it.
+TF-IDF cluster: 7
+BERT cluster: 2
+ColBERT cluster: 3
+
+Sentence 5:
+Asian inspired meals like my orange ginger chicken stir fry, pad pak vegetables and healthy egg roll in a bowl are some of my favourite meals because they have so much flavour, which is why I can't wait for you to try the fried rice recipe I am sharing with you today.
+TF-IDF cluster: 2
+BERT cluster: 1
+ColBERT cluster: 4
+
+Sentence 6:
+Table of Contents
+Why you will love this recipe: 
+Ingredients and substitutions:
+Recipe variations and add ins: 
+How to make tuna fried rice: 
+Top Tips:
+How to serve: 
+How to store: 
+Tuna fried rice FAQs:
+Other seafood recipes you will love: 
+Recipe
+Why you will love this recipe: 
+The taste!
+TF-IDF cluster: 1
+BERT cluster: 8
+ColBERT cluster: 4
+
+Sentence 7:
+This healthy tuna fried rice has such a delicious flavour from the homemade fried rice sauce and the mix of vegetables.
+TF-IDF cluster: 3
+BERT cluster: 1
+ColBERT cluster: 2
+
+Sentence 8:
+It's really quick and easy to make and is ready in just 25 minutes.
+TF-IDF cluster: 3
+BERT cluster: 3
+ColBERT cluster: 8
+
+Sentence 9:
+It's made using simple pantry staple ingredients including canned tuna, white rice, and eggs.
+TF-IDF cluster: 3
+BERT cluster: 8
+ColBERT cluster: 1
+
+Sentence 10:
+You can make the Japanese inspired sauce on this fried rice as spicy or as mild as you like.
+TF-IDF cluster: 1
+BERT cluster: 8
+ColBERT cluster: 4
