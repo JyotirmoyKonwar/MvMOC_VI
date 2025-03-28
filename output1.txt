@@ -1,0 +1,83 @@
+Optimization complete.
+Optimal solutions:
+Solution 1: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 2: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 3: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 4: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 5: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 6: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 7: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 8: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 9: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 10: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 11: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 12: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 13: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 14: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 15: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 16: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 17: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 18: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 19: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+Solution 20: Clusters=9, Silhouette=0.0836, PBM=5407.3248
+
+Selected best solution: 9 clusters
+/home/jyotirmoykonwar/Desktop/Projects/BTP 6/venv/lib/python3.12/site-packages/sklearn_extra/cluster/_k_medoids.py:329: UserWarning: Cluster 5 is empty! self.labels_[self.medoid_indices_[5]] may not be labeled with its corresponding cluster (5).
+  warnings.warn(
+
+Clustering results summary:
+Optimal number of clusters: 9
+Total sentences clustered: 88
+Embedding dimension: 1852
+
+Cluster distribution:
+Cluster 0: 15 sentences
+Cluster 1: 7 sentences
+Cluster 2: 23 sentences
+Cluster 3: 6 sentences
+Cluster 4: 9 sentences
+Cluster 6: 15 sentences
+Cluster 7: 9 sentences
+Cluster 8: 4 sentences
+
+Sample sentences from each cluster:
+
+Cluster 0 (sample):
+- Table of Contents
+- Ingredients and substitutions:
+- Recipe variations and add ins:
+
+Cluster 1 (sample):
+- Canned tuna - I recommend using wild caught tuna and not farmed tuna if possible to make this canned tuna fried rice.
+- If you are gluten free be sure to use coconut aminos rather than soy sauce.
+- If you don't have rice vinegar you could easily use coconut vinegar or apple cider vinegar instead.
+
+Cluster 2 (sample):
+- Asian inspired meals like my orange ginger chicken stir fry, pad pak vegetables and healthy egg roll in a bowl are some of my favourite meals because they have so much flavour, which is why I can't wait for you to try the fried rice recipe I am sharing with you today.
+- Why you will love this recipe:
+- Other seafood recipes you will love:
+
+Cluster 3 (sample):
+- I recommend using pasture raised, large eggs if possible.
+- Vegetables - you can choose any type of fresh veggies for this recipe that you like.
+- I personally love green peas and carrots but other ideas include cauliflower, bell peppers, corn, or broccoli.
+
+Cluster 4 (sample):
+- A pan of tuna fried rice with chopsticks on top of it.
+- How to make tuna fried rice:
+- Tuna fried rice FAQs:
+
+Cluster 6 (sample):
+- A pot filled with cooked white rice with a spoon in the rice.
+- Step 1: First, cook the rice according to the package instructions and set it aside.
+- A glass measuring cup filled with a black sauce with a spoon in it.
+
+Cluster 7 (sample):
+- Quick and Easy One Pan Tuna Fried Rice
+- This is the best tuna fried rice recipe!
+- Made with canned tuna, white rice, eggs, vegetables, and a delicious homemade fried rice sauce, this recipe is so easy to make and is ready in just 25 minutes.
+
+Cluster 8 (sample):
+- You can have a healthy meal on the table in no time!
+- It's a great way to use up any leftover cooked rice and vegetables that you have in the fridge.
+- Store any leftover tuna fried rice in the fridge in an airtight container for up to 5 days.

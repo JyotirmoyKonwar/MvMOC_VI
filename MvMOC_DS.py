@@ -6,7 +6,7 @@ from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import IntegerRandomSampling
 from pymoo.optimize import minimize
 from pymoo.termination import get_termination
-from sklearn.cluster import KMeans
+from sklearn_extra.cluster import KMedoids
 from sklearn.metrics import silhouette_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sentence_transformers import SentenceTransformer
@@ -14,10 +14,7 @@ from transformers import AutoTokenizer, AutoModel
 import torch
 import math
 from sklearn.preprocessing import StandardScaler
-import nltk
-from nltk.tokenize import sent_tokenize
-
-nltk.download('punkt_tab')
+import re
 
 # --------------------------
 # Text Processing Functions
@@ -26,7 +23,22 @@ nltk.download('punkt_tab')
 def read_and_tokenize_text(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         text = file.read()
-    sentences = sent_tokenize(text)
+    
+    # Enhanced sentence splitting that handles multiple punctuation marks and newlines
+    sentences = []
+    # First split by newlines
+    lines = text.split('\n')
+    for line in lines:
+        # Then split by sentence-ending punctuation
+        chunks = re.split(r'(?<=[.!?])\s+', line.strip())
+        for chunk in chunks:
+            # Further split if multiple sentences were joined together
+            sub_sentences = re.split(r'(?<=[.!?])(?=[^\s])', chunk)
+            sentences.extend([s.strip() for s in sub_sentences if s.strip()])
+    
+    # Filter out empty strings and very short sentences
+    sentences = [s for s in sentences if len(s) > 3]  # Minimum 3 characters
+    
     return sentences
 
 # --------------------------
@@ -52,7 +64,6 @@ def get_colbert_embeddings(sentences):
         inputs = tokenizer(sentence, return_tensors="pt", truncation=True, padding=True, max_length=128)
         with torch.no_grad():
             outputs = model(**inputs)
-        # Use CLS token representation as sentence embedding
         cls_embedding = outputs.last_hidden_state[:, 0, :].numpy()
         embeddings.append(cls_embedding.squeeze())
     
@@ -63,25 +74,18 @@ def get_colbert_embeddings(sentences):
 # --------------------------
 
 def pbm_index(X, centers, labels):
-    """
-    PBM (Point-Biserial Metric) index for clustering validation
-    Higher values indicate better clustering
-    """
     k = len(centers)
     N = X.shape[0]
     
-    # Calculate E1 - total dispersion when all data in one cluster
     global_center = np.mean(X, axis=0)
     E1 = np.sum(np.linalg.norm(X - global_center, axis=1))
     
-    # Calculate Ew - within-cluster dispersion
     Ew = 0.0
     for i in range(k):
         cluster_points = X[labels == i]
         if len(cluster_points) > 0:
             Ew += np.sum(np.linalg.norm(cluster_points - centers[i], axis=1))
     
-    # Calculate Db - between-cluster dispersion
     Db = 0.0
     for i in range(k):
         for j in range(i+1, k):
@@ -95,7 +99,7 @@ def pbm_index(X, centers, labels):
 
 def calculate_silhouette(X, labels):
     if len(np.unique(labels)) == 1:
-        return 0  # Minimum value for silhouette score
+        return 0
     try:
         return silhouette_score(X, labels)
     except:
@@ -105,36 +109,27 @@ def calculate_silhouette(X, labels):
 # Multi-view Clustering
 # --------------------------
 
-def multi_view_clustering(views, n_clusters):
-    all_labels = []
-    all_centers = []
+def multi_view_clustering(concatenated_embeddings, n_clusters):
+    scaler = StandardScaler()
+    X = scaler.fit_transform(concatenated_embeddings)
     
-    for view in views:
-        # Standardize each view
-        scaler = StandardScaler()
-        X = scaler.fit_transform(view)
-        
-        # Perform k-means clustering
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-        labels = kmeans.fit_predict(X)
-        centers = kmeans.cluster_centers_
-        
-        all_labels.append(labels)
-        all_centers.append(centers)
+    kmedoids = KMedoids(n_clusters=n_clusters, random_state=42, metric='euclidean')
+    labels = kmedoids.fit_predict(X)
+    centers = kmedoids.cluster_centers_
     
-    return all_labels, all_centers
+    return labels, centers
 
 # --------------------------
 # Optimization Problem
 # --------------------------
 
 class MultiViewClusteringProblem(Problem):
-    def __init__(self, views, min_clusters=2, max_clusters=10):
-        self.views = views
+    def __init__(self, concatenated_embeddings, min_clusters=2, max_clusters=10):
+        self.concatenated_embeddings = concatenated_embeddings
         self.min_clusters = min_clusters
         self.max_clusters = max_clusters
         super().__init__(n_var=1, n_obj=2, n_constr=0, 
-                         xl=np.array([min_clusters]), xu=np.array([max_clusters]))
+                       xl=np.array([min_clusters]), xu=np.array([max_clusters]))
 
     def _evaluate(self, x, out, *args, **kwargs):
         silhouettes = []
@@ -143,36 +138,14 @@ class MultiViewClusteringProblem(Problem):
         for i in range(x.shape[0]):
             n_clusters = int(x[i, 0])
             
-            # Perform multi-view clustering
-            labels_list, centers_list = multi_view_clustering(self.views, n_clusters)
+            labels, centers = multi_view_clustering(self.concatenated_embeddings, n_clusters)
             
-            # Calculate objectives for each view and average them
-            view_silhouettes = []
-            view_pbms = []
+            sil = calculate_silhouette(self.concatenated_embeddings, labels)
+            pbm = pbm_index(self.concatenated_embeddings, centers, labels)
             
-            for view_idx, view in enumerate(self.views):
-                labels = labels_list[view_idx]
-                centers = centers_list[view_idx]
-                
-                # Standardize the view
-                scaler = StandardScaler()
-                X = scaler.fit_transform(view)
-                
-                # Calculate metrics
-                sil = calculate_silhouette(X, labels)
-                pbm = pbm_index(X, centers, labels)
-                
-                view_silhouettes.append(sil)
-                view_pbms.append(pbm)
-            
-            # Average the metrics across views
-            avg_silhouette = np.mean(view_silhouettes)
-            avg_pbm = np.mean(view_pbms)
-            
-            silhouettes.append(avg_silhouette)
-            pbms.append(avg_pbm)
+            silhouettes.append(sil)
+            pbms.append(pbm)
         
-        # We want to maximize both objectives
         out["F"] = np.column_stack([-np.array(silhouettes), -np.array(pbms)])
 
 # --------------------------
@@ -180,12 +153,15 @@ class MultiViewClusteringProblem(Problem):
 # --------------------------
 
 def main(text_file_path):
-    # 1. Read and preprocess text
+    # 1. Read and preprocess text with enhanced splitting
     sentences = read_and_tokenize_text(text_file_path)
     print(f"Processed {len(sentences)} sentences.")
+    print("Sample sentences:")
+    for s in sentences[:5]:
+        print(f"- {s}")
     
     # 2. Generate multi-view embeddings
-    print("Generating TF-IDF embeddings...")
+    print("\nGenerating TF-IDF embeddings...")
     tfidf_embeddings = get_tfidf_embeddings(sentences)
     
     print("Generating BERT embeddings...")
@@ -194,11 +170,17 @@ def main(text_file_path):
     print("Generating ColBERT embeddings...")
     colbert_embeddings = get_colbert_embeddings(sentences)
     
-    # 3. Prepare views
-    views = [tfidf_embeddings, bert_embeddings, colbert_embeddings]
+    # 3. Concatenate all embeddings
+    print("\nConcatenating embeddings...")
+    concatenated_embeddings = np.concatenate([
+        tfidf_embeddings,
+        bert_embeddings,
+        colbert_embeddings
+    ], axis=1)
+    print(f"Final embedding dimension: {concatenated_embeddings.shape[1]}")
     
     # 4. Set up optimization problem
-    problem = MultiViewClusteringProblem(views, min_clusters=2, max_clusters=10)
+    problem = MultiViewClusteringProblem(concatenated_embeddings, min_clusters=2, max_clusters=10)
     
     # 5. Configure algorithm
     algorithm = NSGA2(
@@ -212,16 +194,16 @@ def main(text_file_path):
     termination = get_termination("n_gen", 30)
     
     # 6. Run optimization
-    print("Starting optimization...")
+    print("\nStarting optimization...")
     res = minimize(problem,
-                   algorithm,
-                   termination,
-                   seed=42,
-                   save_history=True,
-                   verbose=True)
+                  algorithm,
+                  termination,
+                  seed=42,
+                  save_history=True,
+                  verbose=True)
     
     # 7. Process results
-    print("Optimization complete.")
+    print("\nOptimization complete.")
     print("Optimal solutions:")
     for i in range(len(res.F)):
         n_clusters = int(res.X[i, 0])
@@ -229,22 +211,21 @@ def main(text_file_path):
         pbm = -res.F[i, 1]
         print(f"Solution {i+1}: Clusters={n_clusters}, Silhouette={silhouette:.4f}, PBM={pbm:.4f}")
     
-    # 8. Select the best compromise solution (you can modify this selection criteria)
+    # 8. Select the best compromise solution
     best_idx = np.argmax([-res.F[i, 0] - res.F[i, 1] for i in range(len(res.F))])
     best_n_clusters = int(res.X[best_idx, 0])
     print(f"\nSelected best solution: {best_n_clusters} clusters")
     
-    # 9. Perform final clustering with optimal number of clusters
-    final_labels, final_centers = multi_view_clustering(views, best_n_clusters)
+    # 9. Perform final clustering
+    final_labels, final_centers = multi_view_clustering(concatenated_embeddings, best_n_clusters)
     
     # 10. Return results
     results = {
         'sentences': sentences,
         'optimal_clusters': best_n_clusters,
-        'tfidf_labels': final_labels[0],
-        'bert_labels': final_labels[1],
-        'colbert_labels': final_labels[2],
-        'all_solutions': [(int(x[0]), -f[0], -f[1]) for x, f in zip(res.X, res.F)]
+        'labels': final_labels,
+        'all_solutions': [(int(x[0]), -f[0], -f[1]) for x, f in zip(res.X, res.F)],
+        'embeddings_shape': concatenated_embeddings.shape
     }
     
     return results
@@ -257,12 +238,22 @@ if __name__ == "__main__":
     
     results = main(sys.argv[1])
     
-    # Print some sample results
-    print("\nSample clustering results:")
-    for i in range(min(10, len(results['sentences']))):
-        print(f"Sentence {i+1}:")
-        print(results['sentences'][i])
-        print(f"TF-IDF cluster: {results['tfidf_labels'][i]}")
-        print(f"BERT cluster: {results['bert_labels'][i]}")
-        print(f"ColBERT cluster: {results['colbert_labels'][i]}")
-        print()
+    # Print clustering results
+    print("\nClustering results summary:")
+    print(f"Optimal number of clusters: {results['optimal_clusters']}")
+    print(f"Total sentences clustered: {len(results['sentences'])}")
+    print(f"Embedding dimension: {results['embeddings_shape'][1]}")
+    
+    # Print cluster distribution
+    unique, counts = np.unique(results['labels'], return_counts=True)
+    print("\nCluster distribution:")
+    for cluster, count in zip(unique, counts):
+        print(f"Cluster {cluster}: {count} sentences")
+    
+    # Print sample sentences from each cluster
+    print("\nSample sentences from each cluster:")
+    for cluster in unique:
+        cluster_sentences = [s for s, l in zip(results['sentences'], results['labels']) if l == cluster]
+        print(f"\nCluster {cluster} (sample):")
+        for s in cluster_sentences[:3]:
+            print(f"- {s}")

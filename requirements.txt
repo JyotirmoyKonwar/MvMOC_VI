@@ -1,6 +1,7 @@
-numpy
+numpy==1.26.4
 pandas
 scikit-learn
 torch
 pymoo
 nltk
+scikit-learn-extra
